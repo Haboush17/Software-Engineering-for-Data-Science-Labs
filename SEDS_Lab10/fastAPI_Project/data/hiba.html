@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced CRUD Interface</title>
+    <!-- Include Bootstrap CSS for dynamic styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #fff;
+            font-family: 'Arial', sans-serif;
+        }
+
+        h1, h2 {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            margin-top: 30px;
+        }
+
+        label {
+            color: #fff;
+        }
+
+        .btn {
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            background-color: #f7b731;
+        }
+
+        .results {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            color: #fff;
+            overflow-x: auto;
+        }
+
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        footer a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4"><i class="fas fa-user-cog"></i> Enhanced CRUD Interface</h1>
+
+        <!-- Create User -->
+        <div class="mb-4">
+            <h2><i class="fas fa-user-plus"></i> Create User</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="createName">Name</label>
+                    <input type="text" id="createName" class="form-control" placeholder="Enter Name">
+                </div>
+                <div class="col-md-6">
+                    <label for="createEmail">Email</label>
+                    <input type="email" id="createEmail" class="form-control" placeholder="Enter Email">
+                </div>
+            </div>
+            <button class="btn btn-warning mt-3" onclick="create_user()">Create User</button>  
+        </div>
+
+        <hr class="text-light">
+
+        <!-- Get All Users -->
+        <div class="mb-4">
+            <h2><i class="fas fa-users"></i> Get All Users</h2>
+            <button class="btn btn-primary" onclick="get_users()">Fetch Users</button>
+        </div>
+
+        <hr class="text-light">
+
+        <!-- Get User by ID -->
+        <div class="mb-4">
+            <h2><i class="fas fa-user"></i> Get User by ID</h2>
+            <label for="userId">User ID</label>
+            <input type="number" id="userId" class="form-control" placeholder="Enter User ID">
+            <button class="btn btn-info mt-3" onclick="get_user_by_id()">Get User</button>
+        </div>
+
+        <hr class="text-light">
+
+        <!-- Update User -->
+        <div class="mb-4">
+            <h2><i class="fas fa-user-edit"></i> Update User</h2>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="updateUserId">User ID</label>
+                    <input type="number" id="updateUserId" class="form-control" placeholder="Enter User ID">
+                </div>
+                <div class="col-md-4">
+                    <label for="updateName">Name</label>
+                    <input type="text" id="updateName" class="form-control" placeholder="Enter New Name">
+                </div>
+                <div class="col-md-4">
+                    <label for="updateEmail">Email</label>
+                    <input type="email" id="updateEmail" class="form-control" placeholder="Enter New Email">
+                </div>
+            </div>
+            <button class="btn btn-success mt-3" onclick="update_user()">Update User</button>
+        </div>
+
+        <hr class="text-light">
+
+        <!-- Delete User Post -->
+        <div class="mb-4">
+            <h2><i class="fas fa-trash"></i> Delete User Post</h2>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="deleteUserId">User ID</label>
+                    <input type="number" id="deleteUserId" class="form-control" placeholder="Enter User ID">
+                </div>
+                <div class="col-md-6">
+                    <label for="deletePostId">Post ID</label>
+                    <input type="number" id="deletePostId" class="form-control" placeholder="Enter Post ID">
+                </div>
+            </div>
+            <button class="btn btn-danger mt-3" onclick="deleteUser()">Delete Post</button>
+        </div>
+
+        <hr class="text-light">
+
+        <!-- Get User Posts -->
+        <div class="mb-4">
+            <h2><i class="fas fa-blog"></i> Get User Posts</h2>
+            <label for="userIdPosts">User ID</label>
+            <input type="number" id="userIdPosts" class="form-control" placeholder="Enter User ID">
+            <button class="btn btn-secondary mt-3" onclick="getUserPosts()">Get Posts</button>
+        </div>
+
+        <div id="output" class="results mt-4"></div>
+    </div>
+
+    <footer>
+        <p>Made with <i class="fas fa-heart"></i> by You. <a href="#">View on GitHub</a></p>
+    </footer>
+
+    <!-- Include Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include Font Awesome for icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+    <script>
+        const apiUrl = "http://localhost:8000";
+
+        async function create_user() {
+            try {
+                const name = document.getElementById("createName").value;
+                const email = document.getElementById("createEmail").value;
+                console.log("Creating user with:", name, email);
+                const response = await fetch(`${apiUrl}/users/new`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email }),
+                });
+                await displayResponse(response);
+            } catch (error) {
+                console.error("Error creating user:", error);
+            }
+        }
+
+        async function get_users() {
+            try {
+                console.log("Fetching users...");
+                const response = await fetch(`${apiUrl}/users/`);
+                await displayResponse(response);
+            } catch (error) {
+                console.error("Error fetching users:", error);
+            }
+        }
+
+        async function get_user_by_id() {
+            const userId = document.getElementById("userId").value;
+            try {
+                console.log(`Fetching user with ID: ${userId}`);
+                const response = await fetch(`${apiUrl}/users/${userId}`);
+                await displayResponse(response);
+            } catch (error) {
+                console.error("Error fetching user by ID:", error);
+            }
+        }
+
+        async function update_user() {
+            const userId = document.getElementById("updateUserId").value;
+            const name = document.getElementById("updateName").value;
+            const email = document.getElementById("updateEmail").value;
+            try {
+                console.log(`Updating user ${userId} with new name: ${name}, new email: ${email}`);
+                const response = await fetch(`${apiUrl}/users/${userId}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email }),
+                });
+                await displayResponse(response);
+            } catch (error) {
+                console.error("Error updating user:", error);
+            }
+        }
+
+        async function deleteUser() {
+            const userId = document.getElementById("deleteUserId").value;
+            const postId = document.getElementById("deletePostId").value;
+            try {
+                console.log(`Deleting post ${postId} from user ${userId}`);
+                const response = await fetch(`${apiUrl}/users/${userId}/delete_post/${postId}`, {
+                    method: "DELETE",
+                });
+                await displayResponse(response);
+            } catch (error) {
+                console.error("Error deleting post:", error);
+            }
+        }
+
+        async function getUserPosts() {
+            const userId = document.getElementById("userIdPosts").value;
+            try {
+                console.log(`Fetching posts for user ${userId}`);
+                const response = await fetch(`${apiUrl}/users/${userId}/posts/`);
+                await displayResponse(response);
+            } catch (error) {
+                console.error("Error fetching user posts:", error);
+            }
+        }
+
+        async function displayResponse(response) {
+            const output = document.getElementById("output");
+            try {
+                const data = await response.json();
+                if (response.ok) {
+                    output.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+                } else {
+                    output.innerHTML = `<p class="text-danger">Error: ${data.detail || "An error occurred"}</p>`;
+                }
+            } catch (error) {
+                console.error("Error displaying response:", error);
+            }
+        }
+    </script>
+</body>
+</html>
